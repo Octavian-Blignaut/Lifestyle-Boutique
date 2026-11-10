@@ -32,6 +32,7 @@
 
       <nav class="site-nav" aria-label="Page">
         <a href="#collection">Collection</a>
+        <a href="#shop">Shop</a>
         <a href="#order">How to order</a>
         <a href="#delivery">Delivery</a>
         <a href="#contact">Contact</a>
@@ -115,6 +116,66 @@
         </ul>
       </section>
 
+      <section class="gallery" id="shop" aria-labelledby="shop-title">
+        <div class="gallery-bar">
+          <div class="section-head">
+            <p class="script">in the shop</p>
+            <h2 id="shop-title">What's available now.</h2>
+          </div>
+          <button type="button" class="gallery-toggle" aria-pressed="false">Pause</button>
+        </div>
+        <p class="gallery-note">
+          Designs shown are for inspiration. Message us to check what's in stock. For a phone
+          cover, tell us your model and we'll match it or suggest something similar.
+        </p>
+        <div class="gallery-roll">
+          <div class="gallery-track">
+            <div class="gallery-set">
+              <button type="button" class="gallery-card" data-src="assets/covers-charms.jpg" data-alt="Phone covers with bows, hearts, pearls and charms. R100 cash.">
+                <img src="assets/covers-charms.jpg" width="576" height="1024" alt="" />
+                <span class="gallery-name">Covers &amp; charms</span>
+                <span class="gallery-price">R100 cash</span>
+              </button>
+              <button type="button" class="gallery-card" data-src="assets/covers-3pack.jpg" data-alt="Sets of three phone covers in plain, heart and leopard prints. R130 a set.">
+                <img src="assets/covers-3pack.jpg" width="576" height="1024" alt="" />
+                <span class="gallery-name">3-pack covers</span>
+                <span class="gallery-price">R130 a set</span>
+              </button>
+              <button type="button" class="gallery-card" data-src="assets/covers-card.jpg" data-alt="Clear and solid phone covers with a card holder. R80 each.">
+                <img src="assets/covers-card.jpg" width="576" height="1024" alt="" />
+                <span class="gallery-name">Card holder covers</span>
+                <span class="gallery-price">R80 each</span>
+              </button>
+              <button type="button" class="gallery-card" data-src="assets/covers-sporty.jpg" data-alt="Sporty phone cases with football, padel and motivational designs. R100 cash.">
+                <img src="assets/covers-sporty.jpg" width="576" height="1024" alt="" />
+                <span class="gallery-name">Sporty cases</span>
+                <span class="gallery-price">R100 cash</span>
+              </button>
+              <button type="button" class="gallery-card" data-src="assets/covers-reminder.jpg" data-alt="Phone cases printed with Christian reminders and scripture. R100 cash.">
+                <img src="assets/covers-reminder.jpg" width="576" height="1024" alt="" />
+                <span class="gallery-name">Reminder cases</span>
+                <span class="gallery-price">R100 cash</span>
+              </button>
+              <button type="button" class="gallery-card" data-src="assets/fragrance-sets.jpg" data-alt="Pink and yellow ladies fragrance sets, each a lotion and a body mist. R180 cash or R200 at month end.">
+                <img src="assets/fragrance-sets.jpg" width="576" height="1024" alt="" />
+                <span class="gallery-name">Fragrance sets</span>
+                <span class="gallery-price">R180 cash <small>R200 month end</small></span>
+              </button>
+              <button type="button" class="gallery-card" data-src="assets/tees.jpg" data-alt="Country road inspired unisex t-shirts in white, wheat and black, sizes medium and large. R180 cash or R200 at month end.">
+                <img src="assets/tees.jpg" width="576" height="1024" alt="" />
+                <span class="gallery-name">Unisex t-shirts</span>
+                <span class="gallery-price">R180 cash <small>R200 month end</small></span>
+              </button>
+              <button type="button" class="gallery-card" data-src="assets/picnic-baskets.jpg" data-alt="Large foldable insulated picnic baskets in several colours. R150 cash or R170 at month end.">
+                <img src="assets/picnic-baskets.jpg" width="576" height="1024" alt="" />
+                <span class="gallery-name">Picnic baskets</span>
+                <span class="gallery-price">R150 cash <small>R170 month end</small></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="order" id="order">
         <div class="order-inner">
           <div class="section-head">
@@ -181,5 +242,64 @@
     </footer>
 
     <a class="call-bar" href="https://wa.me/27626377177">Order on WhatsApp</a>
+
+    <dialog class="lightbox" id="lightbox">
+      <button type="button" class="lightbox-close">Close</button>
+      <img alt="" />
+    </dialog>
+    <script>
+      const lightbox = document.querySelector("#lightbox");
+      const lightboxImage = lightbox.querySelector("img");
+      const track = document.querySelector(".gallery-track");
+      const toggle = document.querySelector(".gallery-toggle");
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      let userPaused = false;
+      let held = false;
+
+      if (!reduceMotion) {
+        const copy = track.querySelector(".gallery-set").cloneNode(true);
+        copy.setAttribute("aria-hidden", "true");
+        copy.querySelectorAll("button").forEach((button) => {
+          button.tabIndex = -1;
+        });
+        track.append(copy);
+      } else {
+        toggle.hidden = true;
+      }
+
+      function syncRoll() {
+        track.classList.toggle("is-paused", userPaused || held || reduceMotion);
+      }
+
+      toggle.addEventListener("click", () => {
+        userPaused = !userPaused;
+        toggle.setAttribute("aria-pressed", String(userPaused));
+        toggle.textContent = userPaused ? "Play" : "Pause";
+        syncRoll();
+      });
+
+      track.addEventListener("click", (event) => {
+        const card = event.target.closest(".gallery-card");
+        if (!card || card.tabIndex === -1) return;
+        lightboxImage.src = card.dataset.src;
+        lightboxImage.alt = card.dataset.alt;
+        held = true;
+        syncRoll();
+        lightbox.showModal();
+      });
+
+      lightbox.querySelector(".lightbox-close").addEventListener("click", () => lightbox.close());
+      lightbox.addEventListener("click", (event) => {
+        if (event.target === lightbox) lightbox.close();
+      });
+      lightbox.addEventListener("close", () => {
+        held = false;
+        syncRoll();
+        lightboxImage.removeAttribute("src");
+        lightboxImage.alt = "";
+      });
+
+      syncRoll();
+    </script>
   </body>
 </html>
